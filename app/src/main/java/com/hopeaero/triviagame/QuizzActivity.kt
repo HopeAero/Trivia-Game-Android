@@ -4,13 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.ComponentActivity
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hopeaero.triviagame.adapters.AnswerAdapter
-import com.hopeaero.triviagame.databinding.ActivityCategoryBinding
 import com.hopeaero.triviagame.databinding.ActivityQuizzBinding
 import com.hopeaero.triviagame.models.Question
 import com.hopeaero.triviagame.provider.DataProvider
@@ -21,10 +16,11 @@ class QuizzActivity : ComponentActivity() {
     private var questions: List<Question> = emptyList()
     private var currentQuestionIndex = 0
     private var categoryName: String? = null
+    private var correctAnswers = 0
+    private var incorrectAnswers = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityQuizzBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -61,9 +57,9 @@ class QuizzActivity : ComponentActivity() {
         val question = questions[currentQuestionIndex]
 
         if (selectedAnswer == question.correctAnswer) {
-            println("✅ Respuesta correcta")
+            correctAnswers++
         } else {
-            println("❌ Respuesta incorrecta")
+            incorrectAnswers++
         }
 
         binding.recyclerViewAnswers.postDelayed({
@@ -86,10 +82,11 @@ class QuizzActivity : ComponentActivity() {
     }
 
     private fun finishQuiz() {
-        val intent = Intent(this, CategoryActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        val intent = Intent(this, ResultActivity::class.java).apply {
+            putExtra("correct_answers", correctAnswers)
+            putExtra("incorrect_answers", incorrectAnswers)
+        }
         startActivity(intent)
         finish()
     }
 }
-
